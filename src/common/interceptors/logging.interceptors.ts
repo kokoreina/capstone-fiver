@@ -38,7 +38,8 @@ export class ResponseSuccessInterceptor implements NestInterceptor {
     return next.handle().pipe(
       map((data) => {
         console.log({ data });
-        return responseSuccess(data, mes, code);
+        res.status(200)
+        return responseSuccess(data, mes, 200);
       }),
     );
   }

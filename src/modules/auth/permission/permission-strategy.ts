@@ -1,52 +1,67 @@
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
+import { Observable } from 'rxjs';
+import { IS_PUBLIC_KEY } from 'src/common/decorators/is-public.decorator';
+import { SKIP_PERMISSION } from 'src/common/decorators/skip-permission.decorator';
+import { PrismaService } from 'src/modules/prisma/prisma.service';
 
-// import {  Strategy } from 'passport-custom';
-// import { PassportStrategy } from '@nestjs/passport';
-// import { BadRequestException, Injectable } from '@nestjs/common';
-// import { ACCESS_TOKEN_SECRET } from 'src/common/constant/app.constant';
-// import { PrismaService } from 'src/modules/prisma/prisma.service';
+@Injectable()
+export class PermissionStrategy implements CanActivate {
+  constructor(
+    private reflector: Reflector,
+    private prisma: PrismaService, 
+  ) {}
 
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const userId = request.user?.id; // Lấy ID người dùng từ token
+    const userRole = request.user?.role; // Lấy role người dùng từ token
 
-// @Injectable()
-// export class CheckPermissionStrategy extends PassportStrategy(Strategy,"check-permission") {
-//   constructor(public prisma:PrismaService) {
-//     super();
-//   }
+    const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
 
-//   async validate(req: any) {
-//     console.log("PERMISSION-validate")
+    // Nếu API là công khai, cho phép tất cả
+    if (isPublic) {
+      return true;
+    }
 
-//     const user=req.user
-//     const role_id=user.role_id
-//     const endpoint= req.route.path
-//     const method=req.method
-//     // Nếu là ADMIN (role_id ===1 ) thì cho qua 
-//     // Bắt buộc phải có return nếu không code sẽ chạy tiếp tục
-//     if(role_id ===1){
-//       return true
-//     }
-//     console.log({
-//       role_id,
-//       endpoint,
-//       method
-//     })
-//     // Đi tìm id của permission thông qua fullpath,method
-//     const permission=await this.prisma.nguoiDung.findFirst({
-//       where:{
-//         endpoint:endpoint,
-//         method:method
-//       }
-//     })
-//     if(!permission) throw new BadRequestException(`Bạn không đủ quyền để sử dụng tài nguyên api`)
-//     const role_permissions = await this.prisma.role_permissions.findFirst({
-//       where :{
-//         permission_id: permission.permission_id,
-//         role_id: role_id,
-//         is_active: true
-//       }
-//     })
-//     if(!role_permissions){
-//       throw new BadRequestException(`Bạn không đủ quyền để sử dụng tài nguyên api`)
-//     }
-//     return true;
-//   }
-// }
+    const skipPermission = this.reflector.getAllAndOverride<boolean>(SKIP_PERMISSION, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+
+    // Nếu API bỏ qua quyền, cho phép tất cả
+    if (skipPermission) {
+      return true;
+    }
+
+    // Kiểm tra vai trò và quyền dựa trên ID người dùng
+    const { method, params } = request; // Lấy method và params từ request
+
+    // Chỉ admin mới có quyền sửa hoặc xóa (PUT, DELETE)
+    if (userRole === 'ADMIN') {
+      return true;
+    }
+
+    // Kiểm tra xem người dùng có quyền thực hiện các hành động trên đối tượng hay không
+    // Dành cho USER
+    if (userRole === 'USER') {
+      if (method === 'POST' || method === 'GET') {
+        return true; // USER có quyền POST và GET
+      }
+
+      // Kiểm tra ID trong URL có khớp với ID của người dùng trong token không
+      if (method === 'PUT' || method === 'DELETE') {
+        const entityId = params.id; // Lấy id từ URL
+        if (userId === parseInt(entityId)) {
+          return true; // Chỉ cho phép nếu ID người dùng trùng với ID trong URL
+        }
+        throw new ForbiddenException('You do not have permission to modify this resource');
+      }
+    }
+
+    return false; // Mặc định là không cho phép nếu không thỏa mãn điều kiện
+  }
+}

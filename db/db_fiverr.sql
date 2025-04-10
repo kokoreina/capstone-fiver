@@ -66,6 +66,18 @@ CREATE TABLE BinhLuan (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+CREATE TABLE Permission (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(50),  -- ROLE: 'admin', 'user'
+    table_name VARCHAR(50),  -- Tên bảng như 'NguoiDung', 'LoaiCongViec', ...
+    can_create BOOLEAN DEFAULT FALSE,  -- Quyền CREATE
+    can_read BOOLEAN DEFAULT FALSE,    -- Quyền READ
+    can_update BOOLEAN DEFAULT FALSE,  -- Quyền UPDATE
+    can_delete BOOLEAN DEFAULT FALSE,  -- Quyền DELETE
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 -- thêm thông tin loại công việc
 INSERT INTO LoaiCongViec (id, ten_loai_cong_viec) VALUES
 (1, 'Graphics & Design'),
@@ -172,5 +184,25 @@ VALUES
 (38, 12, '2025-04-06 13:30:00', false),
 (39, 13, '2025-04-07 15:00:00', true),
 (40, 14, '2025-04-08 17:00:00', false);
+-- permission
+-- Thêm quyền cho Admin
+INSERT INTO Permission (role, table_name, can_create, can_read, can_update, can_delete)
+VALUES
+('ADMIN', 'NguoiDung', true, true, true, true),   -- Admin có quyền CRUD trên bảng NguoiDung
+('ADMIN', 'LoaiCongViec', true, true, true, true), -- Admin có quyền CRUD trên bảng LoaiCongViec
+('ADMIN', 'ChiTietLoaiCongViec', true, true, true, true), -- Admin có quyền CRUD trên bảng ChiTietLoaiCongViec
+('ADMIN', 'CongViec', true, true, true, true),   -- Admin có quyền CRUD trên bảng CongViec
+('ADMIN', 'ThueCongViec', true, true, true, true),   -- Admin có quyền CRUD trên bảng ThueCongViec
+('ADMIN', 'BinhLuan', true, true, true, true);   -- Admin có quyền CRUD trên bảng BinhLuan
+
+-- Thêm quyền cho User
+INSERT INTO Permission (role, table_name, can_create, can_read, can_update, can_delete)
+VALUES
+('USER', 'NguoiDung', false, true, false, false),   -- User chỉ có quyền READ trên bảng NguoiDung
+('USER', 'LoaiCongViec', false, true, false, false),  -- User chỉ có quyền READ trên bảng LoaiCongViec
+('USER', 'ChiTietLoaiCongViec', false, true, false, false), -- User chỉ có quyền READ trên bảng ChiTietLoaiCongViec
+('USER', 'CongViec', false, true, false, false),  -- User chỉ có quyền READ trên bảng CongViec
+('USER', 'ThueCongViec', false, true, false, false),  -- User chỉ có quyền READ trên bảng ThueCongViec
+('USER', 'BinhLuan', true, true, false, false);  -- User có quyền POST READ trên bảng BinhLuan, nhưng không được sửa hay xóa
 
 

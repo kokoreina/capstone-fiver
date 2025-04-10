@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { TokenCheck } from './modules/auth/tokens/token-check';
+import { PermissionCheck } from './modules/auth/permission/permission-check';
+import { ResponseSuccessInterceptor } from './common/interceptors/logging.interceptors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,7 +12,8 @@ async function bootstrap() {
   const reflector = app.get(Reflector);
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalGuards(new TokenCheck(reflector));
-  // app.useGlobalGuards(new (reflector));
+  app.useGlobalGuards(new PermissionCheck(reflector))
+  app.useGlobalInterceptors(new ResponseSuccessInterceptor(reflector))
 
   //cors
   app.enableCors({
