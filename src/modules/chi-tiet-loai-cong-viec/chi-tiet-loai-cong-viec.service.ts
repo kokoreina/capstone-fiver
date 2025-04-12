@@ -31,15 +31,34 @@ export class ChiTietLoaiCongViecService {
     return listChiTietCongViec
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chiTietLoaiCongViec`;
+  async findOne(id: number) {
+    const chitietcongviecid=await this.prisma.chiTietLoaiCongViec.findFirst({
+      where:{
+        id:id
+      }
+    })
+    return chitietcongviecid
   }
 
-  update(id: number, updateChiTietLoaiCongViecDto: UpdateChiTietLoaiCongViecDto) {
-    return `This action updates a #${id} chiTietLoaiCongViec`;
+  async update(id: number, updateChiTietLoaiCongViecDto: UpdateChiTietLoaiCongViecDto) {
+    const{ten_chi_tiet}=updateChiTietLoaiCongViecDto
+    const updateChiTietLoaiCongViec=await this.prisma.chiTietLoaiCongViec.update({
+      where:{
+        id:id
+      },
+      data:{
+        ten_chi_tiet:ten_chi_tiet
+      }
+    })
+    return updateChiTietLoaiCongViec;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} chiTietLoaiCongViec`;
+  async remove(id: number) {
+    const deleteChiTietCongviec=await this.prisma.chiTietLoaiCongViec.delete({
+      where:{
+        id:id
+      }
+    })
+    return deleteChiTietCongviec;
   }
 }

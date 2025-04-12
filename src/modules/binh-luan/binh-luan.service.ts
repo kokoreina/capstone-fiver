@@ -18,8 +18,13 @@ export class BinhLuanService {
     return `This action returns all binhLuan`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} binhLuan`;
+  async findOne(idcongviec: number) {
+    const listcommentwork= await this.prisma.binhLuan.findMany({
+      where:{
+        ma_cong_viec:idcongviec
+      }
+    })
+    return listcommentwork;
   }
   async create(createBinhLuanDto: CreateBinhLuanDto) {
     const{ma_cong_viec,ma_ngoi_binh_luan,noi_dung,sao_binh_luan}=createBinhLuanDto;
@@ -48,7 +53,12 @@ export class BinhLuanService {
     return updateComment
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} binhLuan`;
+  async remove(id: number) {
+    const deleteComment = await this.prisma.binhLuan.delete({
+      where:{
+        id:id
+      }
+    })
+    return deleteComment
   }
 }

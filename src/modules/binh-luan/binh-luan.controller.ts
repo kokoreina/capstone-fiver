@@ -25,12 +25,15 @@ export class BinhLuanController {
   async getListComment() {
     const result=await this.binhLuanService.getListComment()
     return result
+  }@SkipPermission()
+  @ApiBearerAuth()
+  @ResponseSuccess("lấy bình luận theo mã công việc thành công")
+  @Get(':idcongviec')
+  async findOne(@Param('idcongviec') idcongviec: string) {
+    const result= await this.binhLuanService.findOne(+idcongviec);
+    return result
   }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.binhLuanService.findOne(+id);
-  }
+  @ResponseSuccess("Cập nhập bình luận thành công")
   @SkipPermission()
   @ApiBearerAuth()
   @Patch(':id')
@@ -38,9 +41,12 @@ export class BinhLuanController {
     const result=await this.binhLuanService.update(+id, updateBinhLuanDto)
     return result ;
   }
-
+  @ResponseSuccess("Xoá bình luận thành công")
+  @SkipPermission()
+  @ApiBearerAuth()
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.binhLuanService.remove(+id);
+  async remove(@Param('id') id: string) {
+    const result =await this.binhLuanService.remove(+id);
+    return result
   }
 }
