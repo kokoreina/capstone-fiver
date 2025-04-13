@@ -8,8 +8,14 @@ export class LoaiCongViecService {
   constructor(public prisma:PrismaService){
 
   }
-  create(createLoaiCongViecDto: CreateLoaiCongViecDto) {
-    return 'This action adds a new loaiCongViec';
+  async create(createLoaiCongViecDto: CreateLoaiCongViecDto) {
+    const{ten_loai_cong_viec}=createLoaiCongViecDto
+    const postLoaiCongViec=await this.prisma.loaiCongViec.create({
+      data:{
+        ten_loai_cong_viec:ten_loai_cong_viec
+      }
+    })
+    return postLoaiCongViec
   }
 
   async getListLoai() {
@@ -17,15 +23,34 @@ export class LoaiCongViecService {
     return listLoaiCongViec
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} loaiCongViec`;
+  async findOne(id: number) {
+    const inforidloaicongviec=await this.prisma.loaiCongViec.findFirst({
+      where:{
+        id:id
+      }
+    })
+    return inforidloaicongviec;
   }
 
-  update(id: number, updateLoaiCongViecDto: UpdateLoaiCongViecDto) {
-    return `This action updates a #${id} loaiCongViec`;
+  async update(id: number, updateLoaiCongViecDto: UpdateLoaiCongViecDto) {
+    const {ten_loai_cong_viec}=updateLoaiCongViecDto
+    const updateloaicongviec=await this.prisma.loaiCongViec.update({
+      where:{
+        id:id
+      },
+      data:{
+        ten_loai_cong_viec:ten_loai_cong_viec
+      }
+    })
+    return updateloaicongviec
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} loaiCongViec`;
+  async remove(id: number) {
+    const deleteloaicongviec=await this.prisma.loaiCongViec.delete({
+      where:{
+        id:id
+      }
+    })
+    return deleteloaicongviec
   }
 }

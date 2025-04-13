@@ -1,1 +1,3 @@
-export class CreateThueCongViecDto {}
+export class CreateThueCongViecDto {
+    
+}

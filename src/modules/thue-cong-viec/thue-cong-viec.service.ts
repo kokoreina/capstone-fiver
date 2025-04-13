@@ -8,8 +8,14 @@ export class ThueCongViecService {
   constructor(public prisma:PrismaService){
 
   }
-  create(createThueCongViecDto: CreateThueCongViecDto) {
-    return 'This action adds a new thueCongViec';
+  async create(createThueCongViecDto: CreateThueCongViecDto) {
+    const{}=createThueCongViecDto
+    const postThueCongViec= await this.prisma.thueCongViec.create({
+      data:{
+        
+      }
+    })
+    return postThueCongViec
   }
 
   async getListThue() {
@@ -17,15 +23,20 @@ export class ThueCongViecService {
     return listThue
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
+    const inforIdThue= await this.prisma.thueCongViec.findFirst({
+      where:{
+        id:id
+      }
+    })
     return `This action returns a #${id} thueCongViec`;
   }
 
-  update(id: number, updateThueCongViecDto: UpdateThueCongViecDto) {
+  async update(id: number, updateThueCongViecDto: UpdateThueCongViecDto) {
     return `This action updates a #${id} thueCongViec`;
   }
 
-  remove(id: number) {
+  async remove(id: number) {
     return `This action removes a #${id} thueCongViec`;
   }
 }
