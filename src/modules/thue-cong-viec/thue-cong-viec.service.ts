@@ -9,10 +9,13 @@ export class ThueCongViecService {
 
   }
   async create(createThueCongViecDto: CreateThueCongViecDto) {
-    const{}=createThueCongViecDto
+    const{ma_cong_viec,ma_ngoi_thue,ngay_thue,hoan_thanh}=createThueCongViecDto
     const postThueCongViec= await this.prisma.thueCongViec.create({
       data:{
-        
+        ma_cong_viec:ma_cong_viec,
+        ma_ngoi_thue:ma_ngoi_thue,
+        ngay_thue:ngay_thue,
+        hoan_thanh:hoan_thanh
       }
     })
     return postThueCongViec
@@ -29,14 +32,31 @@ export class ThueCongViecService {
         id:id
       }
     })
-    return `This action returns a #${id} thueCongViec`;
+    return inforIdThue
   }
 
   async update(id: number, updateThueCongViecDto: UpdateThueCongViecDto) {
-    return `This action updates a #${id} thueCongViec`;
+    const{ma_cong_viec,ma_ngoi_thue,ngay_thue,hoan_thanh}=updateThueCongViecDto
+    const updateIdthue=await this.prisma.thueCongViec.update({
+      where:{
+        id:id
+      },
+      data:{
+        ma_cong_viec:ma_cong_viec,
+        ma_ngoi_thue:ma_ngoi_thue,
+        ngay_thue:ngay_thue,
+        hoan_thanh:hoan_thanh
+      }
+    })
+    return updateIdthue ;
   }
 
   async remove(id: number) {
-    return `This action removes a #${id} thueCongViec`;
+    const removeIdthue=await this.prisma.thueCongViec.delete({
+      where:{
+        id:id
+      }
+    })
+    return removeIdthue;
   }
 }
